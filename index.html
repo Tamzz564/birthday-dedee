@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Sayang!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #0d0221; min-height: 100vh; overflow-x: hidden; color: #fff; cursor: none;
+        }
+
+        #splashScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #0d0221 100%);
+            z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            transition: opacity 1.5s ease, transform 1.5s ease; pointer-events: auto;
+        }
+        #splashScreen.hidden { opacity: 0; transform: scale(1.05); pointer-events: none; }
+        .splash-text {
+            font-family: 'Playfair Display', serif; font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffb6c1, #fff); -webkit-background-clip: text; background-clip: text; color: transparent;
+            text-shadow: 0 0 40px rgba(255, 182, 193, 0.3); animation: fadeUpGlow 2s ease forwards; opacity: 0; transform: translateY(20px); padding: 0 20px;
+        }
+        .splash-sub { font-size: 1.3rem; color: rgba(255,255,255,0.7); margin-top: 15px; animation: fadeUpGlow 2s ease 0.4s forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUpGlow { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .splash-click { margin-top: 40px; font-size: 0.9rem; color: rgba(255,255,255,0.4); animation: blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+
+        #mainContent { display: none; opacity: 0; transition: opacity 1.5s ease; }
+        #mainContent.show { display: block; opacity: 1; }
+
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background: radial-gradient(circle at 30% 40%, #d47b9c 0%, transparent 50%), radial-gradient(circle at 70% 60%, #6a2c5a 0%, transparent 50%), #1a0b2e;
+            animation: shift 15s infinite alternate;
+        }
+        @keyframes shift { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
+        .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: twinkle 2s infinite alternate; }
+        @keyframes twinkle { 0% { opacity: 0.3; transform: scale(1); } 100% { opacity: 1; transform: scale(1.5); } }
+
+        .cursor { position: fixed; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.5); pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.2s, height 0.2s; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .cursor::after { content: ''; position: absolute; top: -6px; left: -6px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,105,180,0.15); animation: pulseCursor 2s infinite; }
+        @keyframes pulseCursor { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(1.6); opacity: 0; } }
+
+        .confetti { position: fixed; width: 10px; height: 10px; top: -10px; z-index: 9998; pointer-events: none; border-radius: 2px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; position: relative; z-index: 1; }
+
+        .hero { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 0; animation: fadeUp 1.5s ease; }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 4.2rem; background: linear-gradient(135deg, #fff, #ffb6c1); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 40px rgba(255,255,255,0.2); margin-bottom: 20px; line-height: 1.2; }
+        .hero p { font-size: 1.3rem; color: rgba(255,255,255,0.85); max-width: 700px; line-height: 1.8; margin-bottom: 40px; }
+        .glow-line { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #fff, transparent); margin: 20px auto; }
+
+        .btn-white { display: inline-block; padding: 14px 40px; border: 1.5px solid rgba(255,255,255,0.5); border-radius: 50px; background: rgba(255,255,255,0.08); color: #fff; font-size: 1rem; font-weight: 600; backdrop-filter: blur(6px); transition: all 0.3s ease; cursor: pointer; text-decoration: none; letter-spacing: 0.5px; }
+        .btn-white:hover { background: #fff; color: #1a0b2e; transform: scale(1.04); box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2.8rem; color: #fff; text-align: center; margin-bottom: 50px; position: relative; }
+        .section-title::after { content: ''; display: block; width: 80px; height: 2px; background: #fff; margin: 15px auto 0; opacity: 0.5; }
+
+        .about-content { display: flex; gap: 50px; align-items: center; }
+        .about-photos { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .about-photo { aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .about-photo:hover { transform: scale(1.03); border-color: #ffb6c1; box-shadow: 0 0 30px rgba(255, 182, 193, 0.2); }
+        .about-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .about-text { flex: 1.2; }
+        .about-text h3 { font-family: 'Playfair Display', serif; font-size: 2.3rem; color: #fff; margin-bottom: 20px; }
+        .about-text p { color: rgba(255,255,255,0.85); line-height: 1.8; margin-bottom: 20px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tags span { padding: 8px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; font-size: 0.9rem; color: #fff; }
+
+        .wishes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .wish-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); padding: 35px 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; transition: all 0.3s ease; }
+        .wish-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.3); }
+        .wish-card i { font-size: 2.5rem; color: #fff; margin-bottom: 15px; }
+        .wish-card h4 { font-size: 1.3rem; margin-bottom: 10px; color: #fff; }
+        .wish-card p { color: rgba(255,255,255,0.8); line-height: 1.6; font-size: 0.95rem; }
+
+        .message-box { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 30px; padding: 50px 40px; border: 1px solid rgba(255,255,255,0.15); position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .message-box .content { font-size: 1.1rem; line-height: 1.9; color: rgba(255,255,255,0.9); text-align: left; }
+        .message-box .content p { margin-bottom: 20px; }
+        .message-box .signature { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #fff; text-align: right; margin-top: 30px; }
+        .hearts { display: flex; justify-content: center; gap: 20px; margin-top: 40px; }
+        .hearts i { font-size: 2.2rem; color: #fff; animation: heartBeat 1.5s infinite; }
+        .hearts i:nth-child(2) { animation-delay: 0.2s; }
+        .hearts i:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes heartBeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+        footer { margin-top: 80px; padding: 40px 0 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+        footer .initials { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #fff; margin: 10px 0; }
+        footer .date { font-size: 1.1rem; color: rgba(255,255,255,0.8); }
+
+        @media (max-width: 768px) {
+            .splash-text { font-size: 2.5rem; }
+            .hero h1 { font-size: 2.8rem; }
+            .about-content { flex-direction: column; }
+            .about-photos { width: 100%; max-width: 400px; }
+            .message-box { padding: 30px 20px; }
+            .section-title { font-size: 2.2rem; }
+        }
+        @media (max-width: 480px) {
+            .splash-text { font-size: 1.8rem; }
+            .splash-sub { font-size: 1rem; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .about-photos { gap: 10px; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="splashScreen">
+        <div class="splash-text">eeh ada princess nii</div>
+        <div class="splash-sub">ciee yang ulang tahun sekarang 🎂</div>
+        <div class="splash-click">— klik atau tap untuk mulai —</div>
+    </div>
+
+    <div id="mainContent">
+        <div class="bg-glow"></div>
+        <div class="stars" id="starsContainer"></div>
+        <div class="cursor" id="cursor"></div>
+
+        <div class="container">
+            <section class="hero">
+                <h1>🎂selamat ulang tahun yaa, princess cantikkuu</h1>
+                <div class="glow-line"></div>
+                <p>web kecil ini aa buat khusus buat dedee. mungkin isinya sederhana, tapi setiap kata di sini aa tulis pelan-pelan sambil mikirin dedee. jadi... baca sampai habis yaa sayangg. 🤍</p>
+
+                <!-- AUDIO PLAYER – GANTI LINK DI BAWAH -->
+                <audio id="lagu" src="lagu.mp3"></audio>
+                <button class="btn-white" id="playBtn" style="margin-top: 20px;">
+                    <i class="fas fa-music"></i> <span id="btnText">Putar Lagu</span> 🎵
+                </button>
+                <p style="font-size: 0.8rem; opacity: 0.5; margin-top: 5px;">Klik tombol di atas untuk memutar</p>
+            </section>
+
+            <section id="about">
+                <h2 class="section-title">✨ Tentang dedee</h2>
+                <div class="about-content">
+                    <div class="about-photos">
+                        <div class="about-photo">
+                            <img src="https://i.ibb.co.com/0yDv2b5q/IMG-20260414-WA0137.jpg" alt="Foto 1">
+                        </div>
+                        <div class="about-photo">
+                            <img src="https://i.ibb.co.com/q3cfLY5H/IMG-20251227-WA0034.jpg" alt="Foto 2">
+                        </div>
+                        <div class="about-photo">
+                            <img src="https://i.ibb.co.com/G30SJhzL/IMG-20251204-WA0026.jpg" alt="Foto 3">
+                        </div>
+                    </div>
+                    <div class="about-text">
+                        <h3>cantik, baik hati, lucu, penyabar, spesial</h3>
+                        <p> dedee itu cantii bukan cuma dari luarnya ajaa, tapi juga dari hatinya. dedee baik, perhatian, tulus, lucuu, dan selalu jadi diri sendiri. mungkin dedee ndaa sadar, tapi kehadiran dedee aja udah cukup bikin hari hari aa jauh lebih bahagia. makasii yaa, udah jadi alasan aa buat senyum setiap hari. 🤍</p>
+                        <div class="tags">
+                            <span>Cantik</span><span>Baik Hati</span><span>Perhatian</span><span>Setia</span>
+                            <span>Penyabar</span><span>Lucu</span><span>Istimewa</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="wishes">
+                <h2 class="section-title">🎁 Doa & Harapan</h2>
+                <div class="wishes-grid">
+                    <div class="wish-card"><i class="fas fa-heartbeat"></i><h4>🤍 Semoga selalu sehat</h4><p>supaya dedee bisa terus senyum, terus ketawa, dan terus jadi diri dedee yang sekarang.</p></div>
+                    <div class="wish-card"><i class="fas fa-star"></i><h4>🌸 Semoga semua doa dedee pelan-pelan dikabulin</h4><p>walaupun mungkin nggak semuanya datang secepat yang dedee mau.</p></div>
+                    <div class="wish-card"><i class="fas fa-smile"></i><h4>🫂 Semoga selalu ditemuin sama orang baik</h4><p>yang sayang sama dedee setulus yang dedee pantas dapetin.</p></div>
+                </div>
+            </section>
+
+            <section id="message">
+                <h2 class="section-title">💌 Surat Cinta</h2>
+                <div class="message-box">
+                    <div class="content">
+                        <p><strong>Untuk princess cantikkuu, aa sayanggg dedeee. </strong></p>
+                        <p>selamat ulang tahun yang ke-14 yaa sayangkuu. 🎂🤍</p>
+                        <p>jujur yaa, aa bingung harus mulai dari mana. rasanya banyaa bangett yang pengen aa ucapin buat dedee hari ini. tapi sebelum semuanya, aa cuma mau bilang... makasii yaa sayangg. makasiii udaaa lahir ke dunia ini. mungkin kedengarannya sederhana, tapi kalau hari itu dedee ndaa lahir, mungkin aa juga ndaa akan pernah kenal seseorangg sesempurna dirii dedee. yang bisa aa sayang sebesar iniii. aa bersyukur bangett bisa dipertemuin sama dedee. walaupun kita belum bisa ketemu langsungg, walaupun selama ini lebih banyaa saling nemenin lewat chatt, call, buat aa itu udah jadi bagian yang berharga banget. dari chat chat kecil setiap harii, cerita randomm, cerita waktu dedee capee, sampai obrolan yang kadang sepelee tapi selalu bikin aa senyumm. semua itu pelann pelann jadi kenangan yang aa simpen baik baik.</p>
+                        <p>aa tau beberapa bulan terakhir dedee sibuk bangett. sekolah yang kegiatannyaa padatt, ujiann, lombaa osn, fls3n, resensi buku, latihan karawitan, panitia, lomba, dan masih banyaa hal lain yang harus dedee jalanin. kadang aa cuma bisa baca dari chat kalau dedee lagi capee, lagi banyaa pikiran, atau lagi nahan semuanya sendiri. tapi justru dari situ aa makin kagum sama dedee. buat aa, dedee itu kuat. bukan karena dedee ndaa pernah capee atau ndaa pernah sedih. tapi karena walaupun lagi capee, dedee tetap berusaha bangun, tetap sekolah, tetap latihan, tetap jalanin apa yang harus dijalanin. Itu yang aa kagumin dari dedee..</p>
+                        <p>sayanggg.. nanti seiring bertambahnya umur dedee, mungkin akan ada hari hari yang lebih berat dari sekarang. ndaa semua keinginan bakal langsung tercapai. ndaa semua rencana bakal berjalan sesuai harapan. kadang ada hari yang bikin senyum, kadang juga ada hari yang bikin nangis. dan itu ndaa apa apa.</p>
+                        <p>aa cuma pengen dedee inget satu hal. jalan hidup ndaa harus selalu muluss supaya bisa bahagia. kadang justru dari jalan yang berliku, kita belajar jadi orang yang lebih kuat, lebih sabar, dan lebih menghargai hal hal kecil.</p>
+                        <p>kalau nanti suatu hari dedee lagi ngerasa capee sama dunia, lagi ngerasa sendirian, atau lagi pengen nyerah... jangan dipendem semuanya sendiri yaa. cerita aja ke aa. mungkin aa belum bisa langsung ada di samping dedee buat meluk atau nemenin secara langsung, tapi aa bakal selalu berusaha ada buat dengerin semua cerita dedee. selama aa masih bisa, aa pengen jadi tempat yang bikin dedee ngerasa tenang.</p>
+                        <p>aa juga mau minta maaf kalau selama ini aa masih banyaa kurangnyaaa, kadang kurang pekaa, kadang egoiss, kadang respon aa belum sempurna, atau pernah bikin dedee kepikiran. aa masih banyaa belajar buat jadi orang yang lebih baik. tapi ada satu hal yang ndaaa pernah berubah.... sayanggg aa ke dedee.</p>
+                        <p>hari ini umur dedee bertambah satu tahun. aa ndaa cuma berharap dedee makin dewasa, tapi aa juga berharap semoga umur yang baru ini membawa lebih banyaa kebahagiaan, kesehatan, dan orang orang baik di sekitar dedee.</p>
+                        <p>semoga semua doa yang dedee simpan pelan pelan dikabulin. semoga semua cita cita dedee dimudahin jalannyaa. semoga setiap langkah yang dedee ambil selalu dijaga sama tuhan. dan semoga... kalau tuhan mengizinkan, aa masih bisa nemenin dedee lewat banyaa cerita, banyaa tawa, dan banyaa tahunn berikutnyaaa.</p>
+                        <p>terakhir... jangan pernah berubah jadi orang lain yaa. tetap jadi dedee yang aa kenal. dedee yang baik hati, perhatian, tulus, lucu, gemess, kadang overthinking, kadang keras sama diri sendiri, tapi selalu punya hati yang indah.</p>
+                        <p>karena buat aa... di antara semua orang yang pernah aa kenal, tetap cuma dedee yang punya tempat yang ndaa bisa diganti sama siapa pun.</p>
+                        <p>selamat ulang tahun yaa, princess cantikkuu. 🤍</p>
+                        <p>semoga hari ini jadi awal dari umur yang penuh kebahagiaan, dan semoga setiap kali dedee baca web kecil ini, dedee selalu inget kalau ada satu orang yang selalu bangga, selalu percaya, dan selalu sayang sama dedee.</p>
+                        <p><strong>aa sayanggg dedee harii inii, besokk, dan selamanyaaaa 🤍</strong></p>
+                    </div>
+                    <div class="signature">dari aa...
+yang selalu bangga punya dedee. 🤍</div>
+                    <div class="hearts"><i class="fas fa-heart"></i><i class="fas fa-heart"></i><i class="fas fa-heart"></i></div>
+                </div>
+            </section>
+
+            <footer>
+                <div class="date">🎂 25 juni 2026 🎂</div>
+                <div class="initials">A &amp; D</div>
+                <p style="margin-top: 10px;">web kecil ini mungkin suatu hari bakal jadi kenangan.
+tapi semoga rasa sayang aa ke dedee ndaa pernah cuma jadi kenangan. 🤍</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const splashScreen = document.getElementById('splashScreen');
+        const mainContent = document.getElementById('mainContent');
+
+        function enterWebsite() {
+            splashScreen.classList.add('hidden');
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                mainContent.classList.add('show');
+                initMainEffects();
+            }, 1500);
+        }
+        splashScreen.addEventListener('click', enterWebsite);
+        splashScreen.addEventListener('touchstart', enterWebsite);
+        setTimeout(enterWebsite, 4000);
+
+        function generateStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = Math.random() * 3 + 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function initCursor() {
+            const cursor = document.getElementById('cursor');
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+        }
+
+        // ===== MP3 PLAYER =====
+        const audio = document.getElementById('lagu');
+        const playBtn = document.getElementById('playBtn');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', function() {
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    this.innerHTML = '<i class="fas fa-pause"></i> <span id="btnText">Berhenti</span>';
+                    isPlaying = true;
+                }).catch((error) => {
+                    alert('Lagu gagal diputar. Pastikan link MP3 di <audio> sudah valid dan file bisa diakses.');
+                    console.error(error);
+                });
+            } else {
+                audio.pause();
+                this.innerHTML = '<i class="fas fa-music"></i> <span id="btnText">Putar Lagu</span> 🎵';
+                isPlaying = false;
+            }
+        });
+
+        function initMainEffects() {
+            generateStars();
+            initCursor();
+        }
+
+        generateStars();
+        initCursor();
+
+        console.log('🎂 Final MP3 siap. Ganti link MP3 di <audio> lalu kasih ke dia.');
+    </script>
+</body>
+</html>
